@@ -44,22 +44,22 @@ def htmlOutputSetup (config : SiteBaseContext) : IO Unit := do
     ("jump-src.js", jumpSrcJs),
     ("expand-nav.js", expandNavJs),
     ("how-about.js", howAboutJs),
-    ("search.html", searchHtml),
+    ("search.jsonl", searchHtml),
     ("search.js", searchJs),
     ("mathjax-config.js", mathjaxConfigJs),
     ("instances.js", instancesJs),
     ("importedBy.js", importedByJs),
-    ("index.html", indexHtml),
-    ("foundational_types.html", foundationalTypesHtml),
-    ("404.html", notFoundHtml),
-    ("navbar.html", navbarHtml)
+    ("index.jsonl", indexHtml),
+    ("foundational_types.jsonl", foundationalTypesHtml),
+    ("404.jsonl", notFoundHtml),
+    ("navbar.jsonl", navbarHtml)
   ]
   for (fileName, content) in docGenStatic do
     FS.writeFile (basePath / fileName) content
 
   let findHtml := ReaderT.run find { config with depthToRoot := 1 } |>.toString
   let findStatic := #[
-    ("index.html", findHtml),
+    ("index.jsonl", findHtml),
     ("find.js", findJs)
   ]
   for (fileName, content) in findStatic do
@@ -150,4 +150,3 @@ def htmlOutput (result : AnalyzerResult) (hierarchy : Hierarchy) (gitUrl? : Opti
   htmlOutputIndex baseConfig
 
 end DocGen4
-

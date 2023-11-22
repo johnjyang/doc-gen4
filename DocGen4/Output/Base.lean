@@ -102,7 +102,7 @@ Returns the doc-gen4 link to a module name.
 -/
 def moduleNameToLink (n : Name) : BaseHtmlM String := do
   let parts := n.components.map Name.toString
-  return (← getRoot) ++ (parts.intersperse "/").foldl (· ++ ·) "" ++ ".html"
+  return (← getRoot) ++ (parts.intersperse "/").foldl (· ++ ·) "" ++ ".jsonl"
 
 /--
 Returns the HTML doc-gen4 link to a module name.
@@ -115,14 +115,14 @@ Returns the LeanInk link to a module name.
 -/
 def moduleNameToInkLink (n : Name) : BaseHtmlM String := do
   let parts := "src" :: n.components.map Name.toString
-  return (← getRoot) ++ (parts.intersperse "/").foldl (· ++ ·) "" ++ ".html"
+  return (← getRoot) ++ (parts.intersperse "/").foldl (· ++ ·) "" ++ ".jsonl"
 
 /--
 Returns the path to the HTML file that contains information about a module.
 -/
 def moduleNameToFile (basePath : FilePath) (n : Name) : FilePath :=
   let parts := n.components.map Name.toString
-  FilePath.withExtension (basePath / parts.foldl (· / ·) (FilePath.mk ".")) "html"
+  FilePath.withExtension (basePath / parts.foldl (· / ·) (FilePath.mk ".")) "jsonl"
 
 /--
 Returns the directory of the HTML file that contains information about a module.
@@ -148,7 +148,6 @@ are used in documentation generation, notably JS and CSS ones.
   def importedByJs : String := include_str "../../static/importedBy.js"
   def findJs : String := include_str "../../static/find/find.js"
   def mathjaxConfigJs : String := include_str "../../static/mathjax-config.js"
-
   def alectryonCss : String := include_str "../../static/alectryon/alectryon.css"
   def alectryonJs : String := include_str "../../static/alectryon/alectryon.js"
   def docUtilsCss : String  := include_str "../../static/alectryon/docutils_basic.css"
@@ -247,13 +246,13 @@ partial def infoFormatToHtml (i : CodeWithInfos) : HtmlM (Array Html) := do
         match t with
         | .text t =>
           let sortPrefix :: rest := t.splitOn " " | unreachable!
-          let sortLink := <a href={s!"{← getRoot}foundational_types.html"}>{sortPrefix}</a>
+          let sortLink := <a href={s!"{← getRoot}foundational_types.jsonl"}>{sortPrefix}</a>
           let mut restStr := String.intercalate " " rest
           if restStr.length != 0 then
             restStr := " " ++ restStr
           return #[sortLink, Html.text restStr]
         | _ =>
-          return #[<a href={s!"{← getRoot}foundational_types.html"}>[← infoFormatToHtml t]</a>]
+          return #[<a href={s!"{← getRoot}foundational_types.jsonl"}>[← infoFormatToHtml t]</a>]
       | _ =>
          return #[<span class="fn">[← infoFormatToHtml t]</span>]
     | _ => return #[<span class="fn">[← infoFormatToHtml t]</span>]

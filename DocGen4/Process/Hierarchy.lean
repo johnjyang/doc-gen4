@@ -83,20 +83,20 @@ partial def fromArray (names : Array Name) : Hierarchy :=
 
 def baseDirBlackList : HashSet String :=
   HashSet.fromArray #[
-    "404.html",
+    "404.jsonl",
     "color-scheme.js",
     "declaration-data.js",
     "declarations",
     "expand-nav.js",
     "find",
-    "foundational_types.html",
+    "foundational_types.jsonl",
     "how-about.js",
-    "index.html",
+    "index.jsonl",
     "jump-src.js",
     "mathjax-config.js",
-    "navbar.html",
+    "navbar.jsonl",
     "nav.js",
-    "search.html",
+    "search.jsonl",
     "search.js",
     "src",
     "style.css"
@@ -107,8 +107,8 @@ partial def fromDirectoryAux (dir : System.FilePath) (previous : Name) : IO (Arr
   for entry in ← System.FilePath.readDir dir do
     if ← entry.path.isDir then
       children := children ++ (← fromDirectoryAux entry.path (.str previous entry.fileName))
-    else if entry.path.extension = some "html" then
-      children := children.push <| .str previous (entry.fileName.dropRight ".html".length)
+    else if entry.path.extension = some "jsonl" then
+      children := children.push <| .str previous (entry.fileName.dropRight ".jsonl".length)
   return children
 
 def fromDirectory (dir : System.FilePath) : IO Hierarchy := do
@@ -118,8 +118,8 @@ def fromDirectory (dir : System.FilePath) : IO Hierarchy := do
         continue
       else if ← entry.path.isDir then
         children := children ++ (← fromDirectoryAux entry.path (.mkSimple entry.fileName))
-      else if entry.path.extension = some "html" then
-        children := children.push <| .mkSimple (entry.fileName.dropRight ".html".length)
+      else if entry.path.extension = some "jsonl" then
+        children := children.push <| .mkSimple (entry.fileName.dropRight ".jsonl".length)
     return Hierarchy.fromArray children
 
 end Hierarchy
