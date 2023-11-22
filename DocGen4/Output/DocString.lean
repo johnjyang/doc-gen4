@@ -71,7 +71,7 @@ partial def xmlGetHeadingId (el : Xml.Element) : String :=
 def nameToLink? (s : String) : HtmlM (Option String) := do
   let res ← getResult
   if s.endsWith ".lean" && s.contains '/' then
-    return (← getRoot) ++ s.dropRight 5 ++ ".html"
+    return (← getRoot) ++ s.dropRight 5 ++ ".jsonl"
   else if let some name := Lean.Syntax.decodeNameLit ("`" ++ s) then
     -- with exactly the same name
     if res.name2ModIdx.contains name then
