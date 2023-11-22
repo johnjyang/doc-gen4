@@ -21,13 +21,13 @@ def runSingleCmd (p : Parsed) : IO UInt32 := do
 def runIndexCmd (_p : Parsed) : IO UInt32 := do
   let hierarchy ← Hierarchy.fromDirectory Output.basePath
   let baseConfig ← getSimpleBaseContext hierarchy
-  htmlOutputIndex baseConfig
+  -- htmlOutputIndex baseConfig
   return 0
 
 def runGenCoreCmd (_p : Parsed) : IO UInt32 := do
   let (doc, hierarchy) ← loadCore
   let baseConfig ← getSimpleBaseContext hierarchy
-  htmlOutputResults baseConfig doc none (ink := False) 
+  htmlOutputResults baseConfig doc none (ink := False)
   return 0
 
 def runDocGenCmd (_p : Parsed) : IO UInt32 := do

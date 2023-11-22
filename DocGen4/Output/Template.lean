@@ -15,19 +15,9 @@ open scoped DocGen4.Jsx
 The HTML template used for all pages.
 -/
 def baseHtmlGenerator (title : String) (site : Array Html) : BaseHtmlM Html := do
-  let moduleConstant :=
-    if let some module := ← getCurrentName then
-      #[<script>{s!"const MODULE_NAME={String.quote module.toString};"}</script>]
-    else
-      #[]
   pure
     <html lang="en">
-      <body>
-        [site]
-        <nav class="nav">
-          <iframe src={s!"{← getRoot}navbar.json"} class="navframe" frameBorder="0"></iframe>
-        </nav>
-      </body>
+      [site]
     </html>
 
 /--
