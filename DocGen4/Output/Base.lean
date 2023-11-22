@@ -257,14 +257,4 @@ partial def infoFormatToHtml (i : CodeWithInfos) : HtmlM (Array Html) := do
          return #[<span class="fn">[← infoFormatToHtml t]</span>]
     | _ => return #[<span class="fn">[← infoFormatToHtml t]</span>]
 
-def baseHtmlHeadDeclarations : BaseHtmlM (Array Html) := do
-  return #[
-    <meta charset="UTF-8"/>,
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>,
-    <link rel="stylesheet" href={s!"{← getRoot}style.css"}/>,
-    <link rel="stylesheet" href={s!"{← getRoot}src/pygments.css"}/>,
-    <link rel="shortcut icon" href={s!"{← getRoot}favicon.ico"}/>,
-    <link rel="prefetch" href={s!"{← getRoot}/declarations/declaration-data.bmp"} as="image"/>
-  ]
-
 end DocGen4.Output

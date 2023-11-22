@@ -95,7 +95,7 @@ module_facet docs (mod) : FilePath := do
   let depDocJobs ← BuildJob.mixArray <| ← imports.mapM fun mod => fetch <| mod.facet `docs
   let gitUrl ← getGitUrl pkg libConfig mod
   let buildDir := ws.root.buildDir
-  let docFile := mod.filePath (buildDir / "doc") "html"
+  let docFile := mod.filePath (buildDir / "doc") "jsonl"
   depDocJobs.bindAsync fun _ depDocTrace => do
   exeJob.bindAsync fun exeFile exeTrace => do
   modJob.bindSync fun _ modTrace => do
