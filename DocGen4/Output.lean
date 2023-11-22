@@ -75,10 +75,10 @@ open Lean IO System Output Process
 --   for (fileName, content) in alectryonStatic do
 --     FS.writeFile (srcBasePath / fileName) content
 
--- def htmlOutputDeclarationDatas (result : AnalyzerResult) : HtmlT IO Unit := do
---   for (_, mod) in result.moduleInfo.toArray do
---     let jsonDecls ← Module.toJson mod
---     FS.writeFile (declarationsBasePath / s!"declaration-data-{mod.name}.bmp") (toJson jsonDecls).compress
+def jsonlOutputDeclarationDatas (result : AnalyzerResult) : HtmlT IO Unit := do
+  for (_, mod) in result.moduleInfo.toArray do
+    let jsonDecls ← Module.toJson mod
+    FS.writeFile (declarationsBasePath / s!"{mod.name}.bmp") (toJson jsonDecls).compress
 
 def htmlOutputResults (baseConfig : SiteBaseContext) (result : AnalyzerResult) (gitUrl? : Option String) (ink : Bool) : IO Unit := do
   let config : SiteContext := {
@@ -93,26 +93,26 @@ def htmlOutputResults (baseConfig : SiteBaseContext) (result : AnalyzerResult) (
   let some p := (← IO.getEnv "LEAN_SRC_PATH") | throw <| IO.userError "LEAN_SRC_PATH not found in env"
   let sourceSearchPath := System.SearchPath.parse p
 
-  -- discard <| htmlOutputDeclarationDatas result |>.run config baseConfig
+  discard <| jsonlOutputDeclarationDatas result |>.run config baseConfig
 
-  for (modName, module) in result.moduleInfo.toArray do
-    let fileDir := moduleNameToDirectory basePath modName
-    let filePath := moduleNameToFile basePath modName
-    -- path: 'basePath/module/components/till/last.html'
-    -- The last component is the file name, so we drop it from the depth to root.
-    let baseConfig := { baseConfig with
-      depthToRoot := modName.components.dropLast.length
-      currentName := some modName
-    }
-    let moduleHtml := moduleToHtml module |>.run config baseConfig
-    FS.createDirAll fileDir
-    FS.writeFile filePath moduleHtml.toString
-    if ink then
-      if let some inputPath ← Lean.SearchPath.findModuleWithExt sourceSearchPath "lean" module.name then
-        -- path: 'basePath/src/module/components/till/last.html'
-        -- The last component is the file name, however we are in src/ here so dont drop it this time
-        let baseConfig := {baseConfig with depthToRoot := modName.components.length }
-        Process.LeanInk.runInk inputPath |>.run config baseConfig
+  -- for (modName, module) in result.moduleInfo.toArray do
+  --   let fileDir := moduleNameToDirectory basePath modName
+  --   let filePath := moduleNameToFile basePath modName
+  --   -- path: 'basePath/module/components/till/last.html'
+  --   -- The last component is the file name, so we drop it from the depth to root.
+  --   let baseConfig := { baseConfig with
+  --     depthToRoot := modName.components.dropLast.length
+  --     currentName := some modName
+  --   }
+  --   let moduleHtml := moduleToHtml module |>.run config baseConfig
+  --   FS.createDirAll fileDir
+  --   FS.writeFile filePath moduleHtml.toString
+  --   if ink then
+  --     if let some inputPath ← Lean.SearchPath.findModuleWithExt sourceSearchPath "lean" module.name then
+  --       -- path: 'basePath/src/module/components/till/last.html'
+  --       -- The last component is the file name, however we are in src/ here so dont drop it this time
+  --       let baseConfig := {baseConfig with depthToRoot := modName.components.length }
+  --       Process.LeanInk.runInk inputPath |>.run config baseConfig
 
 def getSimpleBaseContext (hierarchy : Hierarchy) : IO SiteBaseContext := do
   return {

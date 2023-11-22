@@ -8,18 +8,11 @@ namespace DocGen4.Output
 
 open Lean
 
-structure JsonDeclarationInfo where
+structure JsonDeclaration where
   name : String
   kind : String
   doc : String
-  docLink : String
   sourceLink : String
-  line : Nat
-  deriving FromJson, ToJson
-
-structure JsonDeclaration where
-  info : JsonDeclarationInfo
-  header : String
 deriving FromJson, ToJson
 
 structure JsonInstance where
@@ -40,7 +33,7 @@ structure JsonHeaderIndex where
 
 structure JsonIndexedDeclarationInfo where
   kind : String
-  docLink : String
+  sourceLink : String
   deriving FromJson, ToJson
 
 structure JsonIndex where
@@ -70,15 +63,15 @@ instance : ToJson JsonIndex where
     return finalJson
 
 def JsonHeaderIndex.addModule (index : JsonHeaderIndex) (module : JsonModule) : JsonHeaderIndex :=
-  let merge idx decl := { idx with declarations := (decl.info.name, decl) :: idx.declarations }
+  let merge idx decl := { idx with declarations := (decl.name, decl) :: idx.declarations }
   module.declarations.foldl merge index
 
 def JsonIndex.addModule (index : JsonIndex) (module : JsonModule) : BaseHtmlM JsonIndex := do
   let mut index := index
   let newModule := (module.name, ← moduleNameToLink (String.toName module.name))
-  let newDecls := module.declarations.map (fun d => (d.info.name, {
-    kind := d.info.kind,
-    docLink := d.info.docLink,
+  let newDecls := module.declarations.map (fun d => (d.name, {
+    kind := d.kind,
+    sourceLink := d.sourceLink,
   }))
   index := { index with
     modules := newModule :: index.modules
@@ -104,12 +97,8 @@ def DocInfo.toJson (module : Name) (info : Process.DocInfo) : HtmlM JsonDeclarat
   let name := info.getName.toString
   let kind := info.getKind
   let doc := info.getDocString.getD ""
-  let docLink ← declNameToLink info.getName
   let sourceLink ← getSourceUrl module info.getDeclarationRange
-  let line := info.getDeclarationRange.pos.line
-  let header := (← docInfoHeader info).toString
-  let info := { name, kind, doc, docLink, sourceLink, line }
-  return { info, header }
+  return { name, kind, doc, sourceLink }
 
 def Process.Module.toJson (module : Process.Module) : HtmlM Json := do
     let mut jsonDecls := []
