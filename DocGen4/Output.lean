@@ -76,9 +76,12 @@ open Lean IO System Output Process
 --     FS.writeFile (srcBasePath / fileName) content
 
 def jsonlOutputDeclarationDatas (result : AnalyzerResult) : HtmlT IO Unit := do
-  for (_, mod) in result.moduleInfo.toArray do
+  for (modName, mod) in result.moduleInfo.toArray do
+    let fileDir := moduleNameToDirectory basePath modName
+    let filePath := moduleNameToFile basePath modName
     let jsonDecls ← Module.toJson mod
-    FS.writeFile (declarationsBasePath / s!"{mod.name}.bmp") (toJson jsonDecls).compress
+    FS.createDirAll fileDir
+    FS.writeFile filePath (toJson jsonDecls).compress
 
 def htmlOutputResults (baseConfig : SiteBaseContext) (result : AnalyzerResult) (gitUrl? : Option String) (ink : Bool) : IO Unit := do
   let config : SiteContext := {
@@ -88,10 +91,10 @@ def htmlOutputResults (baseConfig : SiteBaseContext) (result : AnalyzerResult) (
   }
 
   FS.createDirAll basePath
-  FS.createDirAll declarationsBasePath
+  -- FS.createDirAll declarationsBasePath
 
-  let some p := (← IO.getEnv "LEAN_SRC_PATH") | throw <| IO.userError "LEAN_SRC_PATH not found in env"
-  let sourceSearchPath := System.SearchPath.parse p
+  -- let some p := (← IO.getEnv "LEAN_SRC_PATH") | throw <| IO.userError "LEAN_SRC_PATH not found in env"
+  -- let sourceSearchPath := System.SearchPath.parse p
 
   discard <| jsonlOutputDeclarationDatas result |>.run config baseConfig
 
